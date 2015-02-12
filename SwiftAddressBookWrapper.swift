@@ -961,16 +961,6 @@ private func convertRecordsToPersons(records : [ABRecord]?) -> [SwiftAddressBook
 
 //MARK: some more handy methods
 
-extension NSString {
-    convenience init?(optionalString : String?) {
-        if optionalString == nil {
-            self.init()
-            return nil
-        }
-        self.init(string: optionalString!)
-    }
-}
-
 func errorIfNoSuccess(call : (UnsafeMutablePointer<Unmanaged<CFError>?>) -> Bool) -> CFError? {
     var err : Unmanaged<CFError>? = nil
     let success : Bool = call(&err)
