@@ -109,21 +109,21 @@ class SwiftAddressBook {
     
     var allPeople : [SwiftAddressBookPerson]? {
         get {
-            return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeople(internalAddressBook).takeRetainedValue())
+            return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeople(internalAddressBook).takeRetainedValue() as? [ABRecord])
         }
     }
     
     func allPeopleInSource(source : SwiftAddressBookSource) -> [SwiftAddressBookPerson]? {
-        return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeopleInSource(internalAddressBook, source.internalRecord).takeRetainedValue())
+        return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeopleInSource(internalAddressBook, source.internalRecord).takeRetainedValue() as? [ABRecord])
     }
     
     func allPeopleInSourceWithSortOrdering(source : SwiftAddressBookSource, ordering : SwiftAddressBookOrdering) -> [SwiftAddressBookPerson]? {
-        return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(internalAddressBook, source.internalRecord, ordering.abPersonSortOrderingValue).takeRetainedValue())
+        return convertRecordsToPersons(ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(internalAddressBook, source.internalRecord, ordering.abPersonSortOrderingValue).takeRetainedValue() as? [ABRecord])
     }
     
     func peopleWithName(name : String) -> [SwiftAddressBookPerson]? {
         let string : CFString = name as CFString
-        return convertRecordsToPersons(ABAddressBookCopyPeopleWithName(internalAddressBook, string).takeRetainedValue())
+        return convertRecordsToPersons(ABAddressBookCopyPeopleWithName(internalAddressBook, string).takeRetainedValue() as? [ABRecord])
     }
     
     
@@ -141,12 +141,12 @@ class SwiftAddressBook {
     
     var arrayOfAllGroups : [SwiftAddressBookGroup]? {
         get {
-            return convertRecordsToGroups(ABAddressBookCopyArrayOfAllGroups(internalAddressBook).takeRetainedValue())
+            return convertRecordsToGroups(ABAddressBookCopyArrayOfAllGroups(internalAddressBook).takeRetainedValue() as? [ABRecord])
         }
     }
     
     func allGroupsInSource(source : SwiftAddressBookSource) -> [SwiftAddressBookGroup]? {
-        return convertRecordsToGroups(ABAddressBookCopyArrayOfAllGroupsInSource(internalAddressBook, source.internalRecord).takeRetainedValue())
+        return convertRecordsToGroups(ABAddressBookCopyArrayOfAllGroupsInSource(internalAddressBook, source.internalRecord).takeRetainedValue() as? [ABRecord])
     }
     
     
@@ -164,7 +164,7 @@ class SwiftAddressBook {
     
     var allSources : [SwiftAddressBookSource]? {
         get {
-            return convertRecordsToSources(ABAddressBookCopyArrayOfAllSources(internalAddressBook).takeRetainedValue())
+            return convertRecordsToSources(ABAddressBookCopyArrayOfAllSources(internalAddressBook).takeRetainedValue() as? [ABRecord])
         }
     }
     
@@ -219,7 +219,7 @@ class SwiftAddressBookSource : SwiftAddressBookRecord {
     
     var sourceType : SwiftAddressBookSourceType {
         get {
-            let sourceType : CFNumber = ABRecordCopyValue(internalRecord, kABSourceTypeProperty).takeRetainedValue() as CFNumber
+            let sourceType : CFNumber = ABRecordCopyValue(internalRecord, kABSourceTypeProperty).takeRetainedValue() as! CFNumber
             var rawSourceType : Int32? = nil
             CFNumberGetValue(sourceType, CFNumberGetType(sourceType), &rawSourceType)
             return SwiftAddressBookSourceType(abSourceType: rawSourceType!)
@@ -228,7 +228,7 @@ class SwiftAddressBookSource : SwiftAddressBookRecord {
     
     var searchable : Bool {
         get {
-            let sourceType : CFNumber = ABRecordCopyValue(internalRecord, kABSourceTypeProperty).takeRetainedValue() as CFNumber
+            let sourceType : CFNumber = ABRecordCopyValue(internalRecord, kABSourceTypeProperty).takeRetainedValue() as! CFNumber
             var rawSourceType : Int32? = nil
             CFNumberGetValue(sourceType, CFNumberGetType(sourceType), &rawSourceType)
             let andResult = kABSourceTypeSearchableMask & rawSourceType!
@@ -237,7 +237,7 @@ class SwiftAddressBookSource : SwiftAddressBookRecord {
     }
     
     var sourceName : String {
-        return ABRecordCopyValue(internalRecord, kABSourceNameProperty).takeRetainedValue() as CFString
+        return ABRecordCopyValue(internalRecord, kABSourceNameProperty).takeRetainedValue() as! String
     }
 }
 
@@ -249,7 +249,7 @@ class SwiftAddressBookGroup : SwiftAddressBookRecord {
     
     var name : String {
         get {
-            return ABRecordCopyValue(internalRecord, kABGroupNameProperty).takeRetainedValue() as CFString
+            return ABRecordCopyValue(internalRecord, kABGroupNameProperty).takeRetainedValue() as! String
         }
     }
     
@@ -263,12 +263,12 @@ class SwiftAddressBookGroup : SwiftAddressBookRecord {
     
     var allMembers : [SwiftAddressBookPerson]? {
         get {
-            return convertRecordsToPersons(ABGroupCopyArrayOfAllMembers(internalRecord).takeRetainedValue())
+            return convertRecordsToPersons(ABGroupCopyArrayOfAllMembers(internalRecord).takeRetainedValue() as? [ABRecord])
         }
     }
     
     func allMembersWithSortOrdering(ordering : SwiftAddressBookOrdering) -> [SwiftAddressBookPerson]? {
-        return convertRecordsToPersons(ABGroupCopyArrayOfAllMembersWithSortOrdering(internalRecord, ordering.abPersonSortOrderingValue).takeRetainedValue())
+        return convertRecordsToPersons(ABGroupCopyArrayOfAllMembersWithSortOrdering(internalRecord, ordering.abPersonSortOrderingValue).takeRetainedValue() as? [ABRecord])
     }
     
     func addMember(person : SwiftAddressBookPerson) -> CFError? {
@@ -320,7 +320,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
     class func createVCard(people : [SwiftAddressBookPerson]) -> String {
         let peopleArray : NSArray = people.map{$0.internalRecord}
         let data : NSData = ABPersonCreateVCardRepresentationWithPeople(peopleArray).takeRetainedValue()
-        return NSString(data: data, encoding: NSUTF8StringEncoding)!
+        return NSString(data: data, encoding: NSUTF8StringEncoding)! as! String
     }
     
     class func ordering() -> SwiftAddressBookOrdering {
@@ -362,7 +362,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
     
     var allLinkedPeople : [SwiftAddressBookPerson]? {
         get {
-            return convertRecordsToPersons(ABPersonCopyArrayOfAllLinkedPeople(internalRecord).takeRetainedValue() as CFArray)
+            return convertRecordsToPersons(ABPersonCopyArrayOfAllLinkedPeople(internalRecord).takeRetainedValue() as CFArray as? [ABRecord])
         }
     }
     
@@ -374,7 +374,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
     
     var compositeNameDelimiterForRecord : String {
         get {
-            return ABPersonCopyCompositeNameDelimiterForRecord(internalRecord).takeRetainedValue()
+            return ABPersonCopyCompositeNameDelimiterForRecord(internalRecord).takeRetainedValue() as! String
         }
     }
     
@@ -389,7 +389,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonFirstNameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonFirstNameProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonFirstNameProperty, newValue as NSString?)
         }
     }
     
@@ -398,7 +398,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonLastNameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonLastNameProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonLastNameProperty, newValue as NSString?)
         }
     }
     
@@ -407,7 +407,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonMiddleNameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonMiddleNameProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonMiddleNameProperty, newValue as NSString?)
         }
     }
     
@@ -416,7 +416,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonPrefixProperty)
         }
         set {
-            setSingleValueProperty(kABPersonPrefixProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonPrefixProperty, newValue as NSString?)
         }
     }
     
@@ -425,7 +425,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonSuffixProperty)
         }
         set {
-            setSingleValueProperty(kABPersonSuffixProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonSuffixProperty, newValue as NSString?)
         }
     }
     
@@ -434,7 +434,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonNicknameProperty)
         }
         set {
-            setSingleValueProperty(kABPersonNicknameProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonNicknameProperty, newValue as NSString?)
         }
     }
     
@@ -443,7 +443,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonFirstNamePhoneticProperty)
         }
         set {
-            setSingleValueProperty(kABPersonFirstNamePhoneticProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonFirstNamePhoneticProperty, newValue as NSString?)
         }
     }
     
@@ -452,7 +452,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonLastNamePhoneticProperty)
         }
         set {
-            setSingleValueProperty(kABPersonLastNamePhoneticProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonLastNamePhoneticProperty, newValue as NSString?)
         }
     }
     
@@ -461,7 +461,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonMiddleNamePhoneticProperty)
         }
         set {
-            setSingleValueProperty(kABPersonMiddleNamePhoneticProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonMiddleNamePhoneticProperty, newValue as NSString?)
         }
     }
     
@@ -470,7 +470,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonOrganizationProperty)
         }
         set {
-            setSingleValueProperty(kABPersonOrganizationProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonOrganizationProperty, newValue as NSString?)
         }
     }
     
@@ -479,7 +479,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonJobTitleProperty)
         }
         set {
-            setSingleValueProperty(kABPersonJobTitleProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonJobTitleProperty, newValue as NSString?)
         }
     }
     
@@ -488,7 +488,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonDepartmentProperty)
         }
         set {
-            setSingleValueProperty(kABPersonDepartmentProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonDepartmentProperty, newValue as NSString?)
         }
     }
     
@@ -497,7 +497,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractMultivalueProperty(kABPersonEmailProperty)
         }
         set {
-            setMultivalueProperty(kABPersonEmailProperty, convertMultivalueEntries(newValue, converter: { NSString(string : $0) }))
+            setMultivalueProperty(kABPersonEmailProperty, convertMultivalueEntries(newValue, converter: { $0 as NSString
+            }))
         }
     }
     
@@ -515,7 +516,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractProperty(kABPersonNoteProperty)
         }
         set {
-            setSingleValueProperty(kABPersonNoteProperty, NSString(string: newValue))
+            setSingleValueProperty(kABPersonNoteProperty, newValue as NSString?)
         }
     }
     
@@ -542,7 +543,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractMultivalueProperty(kABPersonAddressProperty)
         }
         set {
-            setMultivalueDictionaryProperty(kABPersonAddressProperty, newValue, { NSString(string: $0.abAddressProperty) }, {$0} )
+            setMultivalueDictionaryProperty(kABPersonAddressProperty, newValue, keyConverter: { $0.abAddressProperty as NSString
+                }, valueConverter: {$0} )
         }
     }
     
@@ -569,7 +571,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractMultivalueProperty(kABPersonPhoneProperty)
         }
         set {
-            setMultivalueProperty(kABPersonPhoneProperty, convertMultivalueEntries(newValue, converter: {NSString(string: $0)}))
+            setMultivalueProperty(kABPersonPhoneProperty, convertMultivalueEntries(newValue, converter: { $0 as NSString
+            }))
         }
     }
     
@@ -578,7 +581,9 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractMultivalueProperty(kABPersonInstantMessageProperty)
         }
         set {
-            setMultivalueDictionaryProperty(kABPersonInstantMessageProperty, newValue, keyConverter: { NSString(string: $0.abInstantMessageProperty) }, valueConverter: { NSString(string: $0) })
+            setMultivalueDictionaryProperty(kABPersonInstantMessageProperty, newValue, keyConverter: { $0.abInstantMessageProperty as NSString
+                }, valueConverter: { $0 as NSString
+            })
         }
     }
     
@@ -587,7 +592,9 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractMultivalueProperty(kABPersonSocialProfileProperty)
         }
         set {
-            setMultivalueDictionaryProperty(kABPersonSocialProfileProperty, newValue, keyConverter: { NSString(string: $0.abSocialProfileProperty) }, valueConverter:  { NSString(string : $0) } )
+            setMultivalueDictionaryProperty(kABPersonSocialProfileProperty, newValue, keyConverter: { $0.abSocialProfileProperty as NSString
+                }, valueConverter:  { $0 as NSString
+            } )
         }
     }
     
@@ -597,7 +604,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractMultivalueProperty(kABPersonURLProperty)
         }
         set {
-            setMultivalueProperty(kABPersonURLProperty, convertMultivalueEntries(newValue, converter: { NSString(string : $0) }))
+            setMultivalueProperty(kABPersonURLProperty,convertMultivalueEntries(newValue, converter: { $0 as NSString
+            }))
         }
     }
     
@@ -606,7 +614,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             return extractMultivalueProperty(kABPersonRelatedNamesProperty)
         }
         set {
-            setMultivalueProperty(kABPersonRelatedNamesProperty, convertMultivalueEntries(newValue, converter: { NSString(string : $0) }))
+            setMultivalueProperty(kABPersonRelatedNamesProperty, convertMultivalueEntries(newValue, converter: { $0 as NSString
+            }))
         }
     }
     
@@ -638,7 +647,7 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
             let value : T? = ABMultiValueCopyValueAtIndex(multivalue, i).takeRetainedValue() as? T
             if let v : T = value {
                 let id : Int = Int(ABMultiValueGetIdentifierAtIndex(multivalue, i))
-                let label : String = ABMultiValueCopyLabelAtIndex(multivalue, i).takeRetainedValue()
+                let label : String = ABMultiValueCopyLabelAtIndex(multivalue, i).takeRetainedValue() as! String
                 array.append(MultivalueEntry(value: v, label: label, id: id))
             }
         }
@@ -663,11 +672,21 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
         }
     }
     
-    private func convertMultivalueEntries<T,U : AnyObject>(multivalue : Array<MultivalueEntry<T>>?, converter : (T) -> U) -> Array<MultivalueEntry<U>>? {
+    private func convertMultivalueEntries<T, U : AnyObject>(multivalue : Array<MultivalueEntry<T>>?, converter :  (T) -> U) -> Array<MultivalueEntry<U>>? {
         return multivalue?.map { m -> MultivalueEntry<U> in
             return MultivalueEntry(value: converter(m.value), label: m.label, id: m.id)
         }
     }
+    
+    private func setMultivalueDictionaryProperty<T,U, V : AnyObject,W : AnyObject where V : Hashable >(key : ABPropertyID,_ multivalue : Array<MultivalueEntry<Dictionary<T,U>>>?,keyConverter : (T) -> V , valueConverter : (U)-> W) {
+        
+        let array = convertMultivalueEntries(multivalue, converter: { d -> NSDictionary in
+            return self.convertDictionary(d, keyConverter: keyConverter, valueConverter: valueConverter)!
+        })
+        
+        setMultivalueProperty(key, array)
+    }
+    
     
     private func setMultivalueProperty<T : AnyObject>(key : ABPropertyID,_ multivalue : Array<MultivalueEntry<T>>?) {
         if(multivalue == nil) {
@@ -700,16 +719,8 @@ class SwiftAddressBookPerson : SwiftAddressBookRecord {
         
         ABRecordSetValue(internalRecord, key, abMultivalue, nil)
     }
-    
-    private func setMultivalueDictionaryProperty<T,U, V : AnyObject,W : AnyObject where V : Hashable >(key : ABPropertyID,_ multivalue : Array<MultivalueEntry<Dictionary<T,U>>>?,keyConverter : (T) -> V , valueConverter : (U)-> W) {
-        
-        let array = convertMultivalueEntries(multivalue, converter: { d -> NSDictionary in
-            return self.convertDictionary(d, keyConverter: keyConverter, valueConverter: valueConverter)!
-        })
-        
-        setMultivalueProperty(key, array)
-    }
 }
+
 //MARK: swift structs for convenience
 
 enum SwiftAddressBookOrdering {
@@ -799,13 +810,13 @@ enum SwiftAddressBookSocialProfileProperty {
     
     init(property : String) {
         switch property {
-        case kABPersonSocialProfileURLKey :
+        case kABPersonSocialProfileURLKey as! String :
             self = .url
-        case kABPersonSocialProfileServiceKey :
+        case kABPersonSocialProfileServiceKey as! String :
             self = .service
-        case kABPersonSocialProfileUsernameKey :
+        case kABPersonSocialProfileUsernameKey as! String :
             self = .username
-        case kABPersonSocialProfileUserIdentifierKey :
+        case kABPersonSocialProfileUserIdentifierKey as! String :
             self = .userIdentifier
         default :
             self = .url
@@ -815,13 +826,13 @@ enum SwiftAddressBookSocialProfileProperty {
     var abSocialProfileProperty : String {
         switch self {
         case .url :
-            return kABPersonSocialProfileURLKey
+            return kABPersonSocialProfileURLKey as! String
         case .service :
-            return kABPersonSocialProfileServiceKey
+            return kABPersonSocialProfileServiceKey as! String
         case .username :
-            return kABPersonSocialProfileUsernameKey
+            return kABPersonSocialProfileUsernameKey as! String
         case .userIdentifier :
-            return kABPersonSocialProfileUserIdentifierKey
+            return kABPersonSocialProfileUserIdentifierKey as! String
         }
     }
 }
@@ -831,9 +842,9 @@ enum SwiftAddressBookInstantMessagingProperty {
     
     init(property : String) {
         switch property {
-        case kABPersonInstantMessageServiceKey :
+        case kABPersonInstantMessageServiceKey as! String :
             self = .service
-        case kABPersonInstantMessageUsernameKey :
+        case kABPersonInstantMessageUsernameKey as! String :
             self = .username
         default :
             self = .service
@@ -843,9 +854,9 @@ enum SwiftAddressBookInstantMessagingProperty {
     var abInstantMessageProperty : String {
         switch self {
         case .service :
-            return kABPersonInstantMessageServiceKey
+            return kABPersonInstantMessageServiceKey as! String
         case .username :
-            return kABPersonInstantMessageUsernameKey
+            return kABPersonInstantMessageUsernameKey as! String
         }
     }
 }
@@ -883,17 +894,17 @@ enum SwiftAddressBookAddressProperty {
     
     init(property : String) {
         switch property {
-        case kABPersonAddressStreetKey:
+        case kABPersonAddressStreetKey as! String:
             self = .street
-        case kABPersonAddressCityKey:
+        case kABPersonAddressCityKey as! String:
             self = .city
-        case kABPersonAddressStateKey:
+        case kABPersonAddressStateKey as! String:
             self = .state
-        case kABPersonAddressZIPKey:
+        case kABPersonAddressZIPKey as! String:
             self = .zip
-        case kABPersonAddressCountryKey:
+        case kABPersonAddressCountryKey as! String:
             self = .country
-        case kABPersonAddressCountryCodeKey:
+        case kABPersonAddressCountryCodeKey as! String:
             self = .countryCode
         default:
             self = .street
@@ -904,19 +915,19 @@ enum SwiftAddressBookAddressProperty {
         get {
             switch self {
             case .street :
-                return kABPersonAddressStreetKey
+                return kABPersonAddressStreetKey as! String
             case .city :
-                return kABPersonAddressCityKey
+                return kABPersonAddressCityKey as! String
             case .state :
-                return kABPersonAddressStateKey
+                return kABPersonAddressStateKey as! String
             case .zip :
-                return kABPersonAddressZIPKey
+                return kABPersonAddressZIPKey as! String
             case .country :
-                return kABPersonAddressCountryKey
+                return kABPersonAddressCountryKey as! String
             case .countryCode :
-                return kABPersonAddressCountryCodeKey
+                return kABPersonAddressCountryCodeKey as! String
             default:
-                return kABPersonAddressStreetKey
+                return kABPersonAddressStreetKey as! String
             }
         }
     }
@@ -951,12 +962,12 @@ private func convertRecordsToPersons(records : [ABRecord]?) -> [SwiftAddressBook
 //MARK: some more handy methods
 
 extension NSString {
-    convenience init?(string : String?) {
-        if string == nil {
+    convenience init?(optionalString : String?) {
+        if optionalString == nil {
             self.init()
             return nil
         }
-        self.init(string: string!)
+        self.init(string: optionalString!)
     }
 }
 
