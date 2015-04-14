@@ -8,6 +8,7 @@
 
 import Foundation
 import AddressBook
+import UIKit
 
 //MARK: Wrapper for ABAddressBookRecord of type ABPerson
 
@@ -351,6 +352,11 @@ public class SwiftAddressBookPerson : SwiftAddressBookRecord {
 		}
 	}
 
+    public var recordID: Int {
+        get {
+            return Int(ABRecordGetRecordID(self.internalRecord))
+        }
+    }
 
 	//MARK: generic methods to set and get person properties
 
